@@ -1,3 +1,5 @@
+console.log("scripts.js");
+
 document.addEventListener("DOMContentLoaded", function () {
   // Select all wrapper containers
   const testimonialWrappers = document.querySelectorAll(
