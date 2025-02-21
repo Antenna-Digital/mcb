@@ -14,7 +14,35 @@ document.addEventListener("DOMContentLoaded", function () {
     const swiperElement = wrapper.querySelector(".swiper");
 
     if (swiperElement) {
-      new Swiper(swiperElement, {
+      let swiper;
+      
+      const updateHeight = () => {
+        const slides = swiperElement.querySelectorAll('.swiper-slide');
+        let maxHeight = 0;
+        
+        slides.forEach(slide => {
+          // Reset height to get true content height
+          slide.style.height = 'auto';
+          const height = slide.offsetHeight;
+          maxHeight = Math.max(maxHeight, height);
+        });
+
+        // Set the height on all slides
+        slides.forEach(slide => {
+          slide.style.height = `${maxHeight}px`;
+        });
+        
+        // Update swiper
+        if (swiper) {
+          swiper.update();
+        }
+      };
+
+      // Initial height setup
+      updateHeight();
+
+      // Initialize Swiper
+      swiper = new Swiper(swiperElement, {
         // Show only one slide at a time
         slidesPerView: 1,
 
@@ -52,7 +80,7 @@ document.addEventListener("DOMContentLoaded", function () {
         effect: "slide",
 
         // Auto height
-        autoHeight: true,
+        autoHeight: false,
 
         // Loop through slides
         loop: true,
@@ -62,6 +90,9 @@ document.addEventListener("DOMContentLoaded", function () {
         touchAngle: 45,
         grabCursor: true,
       });
+
+      // Update heights on window resize
+      window.addEventListener('resize', updateHeight);
     }
   });
 
