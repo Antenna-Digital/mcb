@@ -1,4 +1,6 @@
-console.log("scripts.js");
+const time = new Date().getTime();
+
+console.log("We Are Loaded", time);
 
 document.addEventListener("DOMContentLoaded", function () {
   // Select all wrapper containers
@@ -63,10 +65,10 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  const wrappers = document.querySelectorAll(".logo-slider_wrapper");
+  const logoWrappers = document.querySelectorAll(".logo-slider_wrapper");
 
-  wrappers.forEach((wrapper) => {
-    const swiperElement = wrapper.querySelector(".swiper");
+  logoWrappers.forEach((logoWrapper) => {
+    const swiperElement = logoWrapper.querySelector(".swiper");
 
     if (swiperElement) {
       const swiper = new Swiper(swiperElement, {
@@ -92,12 +94,12 @@ document.addEventListener("DOMContentLoaded", function () {
         slidesPerGroup: 1,
 
         navigation: {
-          nextEl: wrapper.querySelector(".logo-slider_arrow_next"),
-          prevEl: wrapper.querySelector(".logo-slider_arrow_prev"),
+          nextEl: logoWrapper.querySelector(".logo-slider_arrow_next"),
+          prevEl: logoWrapper.querySelector(".logo-slider_arrow_prev"),
         },
 
         pagination: {
-          el: wrapper.querySelector(".swiper-pagination"),
+          el: logoWrapper.querySelector(".swiper-pagination"),
           clickable: true,
         },
 
@@ -140,51 +142,54 @@ document.addEventListener("DOMContentLoaded", function () {
   const tabs = document.querySelectorAll(".logo-slider_tabs_navigation_text");
   const panels = document.querySelectorAll(".logo-slider_wrapper");
 
-  // Add proper ARIA roles and properties
-  tabList.setAttribute("role", "tablist");
+  // Only proceed if tabList exists
+  if (tabList) {
+    // Add proper ARIA roles and properties
+    tabList.setAttribute("role", "tablist");
 
-  // Ensure first tab is active by default
-  if (tabs.length > 0) {
-    tabs[0].classList.add("active");
-    const firstPanelId = tabs[0].getAttribute("data-tab");
-    const firstPanel = document.getElementById(firstPanelId);
-    if (firstPanel) {
-      panels.forEach((panel) => (panel.style.display = "none"));
-      firstPanel.style.display = "block";
+    // Ensure first tab is active by default
+    if (tabs.length > 0) {
+      tabs[0].classList.add("active");
+      const firstPanelId = tabs[0].getAttribute("data-tab");
+      const firstPanel = document.getElementById(firstPanelId);
+      if (firstPanel) {
+        panels.forEach((panel) => (panel.style.display = "none"));
+        firstPanel.style.display = "block";
+      }
     }
+
+    tabs.forEach((tab, index) => {
+      // Set tab attributes
+      tab.setAttribute("role", "tab");
+      tab.setAttribute("aria-selected", tab.classList.contains("active"));
+      tab.setAttribute("aria-controls", tab.getAttribute("data-tab"));
+      tab.setAttribute("id", `tab-${tab.getAttribute("data-tab")}`);
+      tab.setAttribute("tabindex", tab.classList.contains("active") ? "0" : "-1");
+
+      // Set panel attributes
+      const panel = document.getElementById(tab.getAttribute("data-tab"));
+      if (panel) {
+        panel.setAttribute("role", "tabpanel");
+        panel.setAttribute(
+          "aria-labelledby",
+          `tab-${tab.getAttribute("data-tab")}`
+        );
+        panel.setAttribute("tabindex", "0");
+        panel.setAttribute("hidden", !tab.classList.contains("active"));
+      }
+
+      // Add click handler
+      tab.addEventListener("click", (e) => {
+        e.preventDefault();
+        switchTab(tab);
+      });
+
+      // Add keyboard handler
+      tab.addEventListener("keydown", (e) => {
+        handleTabKeyboard(e, index, tabs);
+      });
+    });
   }
-
-  tabs.forEach((tab, index) => {
-    // Set tab attributes
-    tab.setAttribute("role", "tab");
-    tab.setAttribute("aria-selected", tab.classList.contains("active"));
-    tab.setAttribute("aria-controls", tab.getAttribute("data-tab"));
-    tab.setAttribute("id", `tab-${tab.getAttribute("data-tab")}`);
-    tab.setAttribute("tabindex", tab.classList.contains("active") ? "0" : "-1");
-
-    // Set panel attributes
-    const panel = document.getElementById(tab.getAttribute("data-tab"));
-    if (panel) {
-      panel.setAttribute("role", "tabpanel");
-      panel.setAttribute(
-        "aria-labelledby",
-        `tab-${tab.getAttribute("data-tab")}`
-      );
-      panel.setAttribute("tabindex", "0");
-      panel.setAttribute("hidden", !tab.classList.contains("active"));
-    }
-
-    // Add click handler
-    tab.addEventListener("click", (e) => {
-      e.preventDefault();
-      switchTab(tab);
-    });
-
-    // Add keyboard handler
-    tab.addEventListener("keydown", (e) => {
-      handleTabKeyboard(e, index, tabs);
-    });
-  });
 
   function switchTab(newTab) {
     // Update selected tab
@@ -236,7 +241,96 @@ document.addEventListener("DOMContentLoaded", function () {
 
     switchTab(targetTab);
   }
+
+  // Add the new image slider initialization
+  const imageSliderWrappers = document.querySelectorAll(".slide-images_wrapper");
+  console.log('Found wrappers:', imageSliderWrappers.length);
+  
+  imageSliderWrappers.forEach((wrapper) => {
+    const swiperElement = wrapper.querySelector(".swiper");
+    console.log('Found swiper element:', !!swiperElement);
+    console.log('Found slides:', wrapper.querySelectorAll('.swiper-slide').length);
+
+    if (swiperElement) {
+      const swiper = new Swiper(swiperElement, {
+
+        slidesPerView: 6,
+        spaceBetween: 60,
+
+        breakpoints: {
+          320: {
+            slidesPerView: 2,
+            spaceBetween: 10,
+          },
+          768: {
+            slidesPerView: 3,
+            spaceBetween: 15,
+          },
+          1200: {
+            slidesPerView: 3.5,
+            spaceBetween: 60,
+          },
+          1400: {
+            slidesPerView: 6,
+            spaceBetween: 60,
+          },
+          1920: {
+            slidesPerView: 6,
+            spaceBetween: 60,
+          },
+        },
+
+        // Enable navigation arrows (only if they exist)
+        navigation: wrapper.querySelector(".swiper-arrow-next") ? {
+          nextEl: wrapper.querySelector(".swiper-arrow-next"),
+          prevEl: wrapper.querySelector(".swiper-arrow-prev"),
+        } : false,
+
+        // Basic settings
+        speed: 2000,
+        autoplay: {
+          delay: 2000,
+          disableOnInteraction: false, // Keeps autoplay running after user interaction
+        },
+
+        loop: true,
+
+      });
+
+      // Log initialization for debugging
+      console.log('Slider initialized:', swiper.initialized);
+    }
+  });
 });
+
+
+  // Add the new image slider initialization
+  const imageSliderWrappers = document.querySelectorAll(".large-image-slider_wrapper");
+  console.log('Found wrappers:', imageSliderWrappers.length);
+  
+  imageSliderWrappers.forEach((wrapper) => {
+    const swiperElement = wrapper.querySelector(".swiper");
+
+    if (swiperElement) {
+      const swiper = new Swiper(swiperElement, {
+        slidesPerView: 'auto', // This allows slides to be sized by CSS
+        spaceBetween: 30,
+        
+        // Enable navigation arrows (only if they exist)
+        navigation: wrapper.querySelector(".swiper-arrow-next") ? {
+          nextEl: wrapper.querySelector(".swiper-arrow-next"),
+          prevEl: wrapper.querySelector(".swiper-arrow-prev"),
+        } : false,
+        centeredSlides: true,
+        speed: 2000,
+        autoplay: {
+          delay: 2000,
+          disableOnInteraction: false,
+        },
+        loop: true,
+      });
+    }
+  });
 
 function updateSlideBorders(swiper) {
   // First, remove all borders
